@@ -218,3 +218,51 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+coverage/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database and local infrastructure
+*.db
+*.sqlite3
+postgres-data/
+redis-data/
+
+# AI and generated data
+artifacts/
+uploads/
+generated/
+*.pkl
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
