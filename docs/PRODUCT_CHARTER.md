@@ -51,10 +51,60 @@ Creates policies, manages permissions and reviews security evidence.
 Views or exports authorized compliance and incident evidence.
 
 ## 5. Initial Demo Scenarios
+### Shared Workflow and Execution Boundary
+
+Both scenarios use the same controlled pipeline:
+
+1. Receive the alert
+2. Validate and normalize the alert
+3. Store the incident
+4. Display it on the dashboard
+5. Investigate available evidence
+6. Propose a recovery action
+7. Simulate the proposed action
+8. Evaluate deterministic policy and risk
+9. Request human approval
+10. Execute through a restricted adapter
+11. Verify the result
+12. Record audit evidence
+
+A proposed action is a recommendation and is not automatically an executed action.
+
+During the 30-day MVP, all execution must use mock adapters or a controlled local Kubernetes cluster. AgentShield will not connect to customer production infrastructure.
 
 ### Scenario One: Failed Kubernetes Deployment
 
 A new deployment causes unhealthy pods and increased application errors.
+#### Concrete MVP Test Case
+
+| Field | Test value |
+|---|---|
+| Service | `payments-api` |
+| Environment | `development` |
+| Alert source | `mock_kubernetes_alert_generator` |
+| Incident type | `deployment_failure` |
+| Severity | `high` |
+| Initial status | `open` |
+| Healthy replicas | `0` |
+| Expected replicas | `3` |
+| Error rate | `38.5%` |
+| Suspected deployment | `payments-api-v2` |
+
+#### Proposed Action
+
+The agent proposes `rollback_deployment` for `payments-api`, replacing `payments-api-v2` with the last known healthy version, `payments-api-v1`.
+
+This remains a proposal until the simulation, deterministic policy check and authorized human approval are complete.
+
+#### Verification Conditions
+
+The recovery is successful only when:
+
+- Healthy replicas reach `3/3`
+- Error rate falls below `2%`
+- Health remains stable for two consecutive verification checks
+- No unauthorized execution occurs
+- Repeated requests do not execute the rollback twice
 
 AgentShield Ops will:
 
@@ -72,7 +122,37 @@ AgentShield Ops will:
 ### Scenario Two: Suspicious Traffic
 
 A service receives repeated suspicious requests from an IP address.
+#### Concrete MVP Test Case
 
+| Field | Test value |
+|---|---|
+| Service | `payments-api` |
+| Environment | `development` |
+| Alert source | `mock_security_alert_generator` |
+| Incident type | `suspicious_traffic` |
+| Severity | `medium` |
+| Initial status | `open` |
+| Source IP | `203.0.113.42` |
+| Requests per minute | `850` |
+| Failed requests | `91%` |
+
+The IP address `203.0.113.42` is reserved for documentation and testing. It does not represent a real customer or attacker.
+
+#### Proposed Action
+
+The agent proposes `block_ip` for `203.0.113.42` in the development environment for 15 minutes.
+
+This remains a proposal until the simulation, deterministic policy check and authorized human approval are complete.
+
+#### Verification Conditions
+
+The response is successful only when:
+
+- Requests from the test IP fall to zero during the next simulated interval
+- Normal test traffic remains available
+- The temporary block expires after 15 minutes
+- No unauthorized block occurs
+- Repeated requests do not create duplicate blocks
 AgentShield Ops will:
 
 1. Detect abnormal traffic
@@ -85,7 +165,17 @@ AgentShield Ops will:
 8. Execute an approved mock firewall action
 9. Verify that suspicious traffic decreases
 10. Produce compliance evidence
+### Week One Scope Boundary
 
+Week One is limited to:
+
+1. Receive a mock alert
+2. Validate its required fields
+3. Normalize it into the shared incident structure
+4. Store it for the correct tenant
+5. Display it on the operations dashboard
+
+Week One does not include LLM investigation, automated recommendations, policy decisions, human approvals or recovery execution. Those capabilities will be added only after incident ingestion and tenant isolation work correctly.
 ## 6. Security Principles
 
 AgentShield Ops will follow these principles:
