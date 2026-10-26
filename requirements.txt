@@ -1,0 +1,4 @@
+langgraph
+pydantic>=2
+pytest
+httpx   # only needed for clients/http_client.py (real backend)

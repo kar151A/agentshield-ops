@@ -1,0 +1,29 @@
+{
+  "incidents": {
+    "org-a": {
+      "b326882c62ae334e2eb897ea7eba0a79": {
+        "incident_id": "inc-74e31901",
+        "event": {
+          "idempotency_key": "b326882c62ae334e2eb897ea7eba0a79",
+          "incident_type": "deployment_failure",
+          "severity": "high",
+          "title": "payments-api pods crash looping after new rollout",
+          "service": "payments-api",
+          "environment": "development",
+          "source": "alertmanager",
+          "source_event_id": "b777e8f8d7a43a29",
+          "detected_at": "2026-10-26T09:00:00Z",
+          "evidence": {
+            "alertname": "KubePodCrashLooping",
+            "restarts": "6",
+            "deployment_revision": "42",
+            "previous_revision": "41",
+            "namespace": "payments",
+            "cluster": "dev-cluster"
+          },
+          "status": "open"
+        }
+      }
+    }
+  }
+}
