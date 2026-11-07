@@ -1,9 +1,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Response, status
+from sqlalchemy.orm import Session
 
 from app.core.security import TenantContext, get_tenant_context
-from app.repositories.incident_repository import incident_repository
+from app.db.session import get_db
+from app.repositories.postgres_incident_repository import (
+    postgres_incident_repository,
+)
 from app.schemas.incident import IncidentCreate, IncidentResponse
 
 
@@ -43,6 +47,7 @@ def create_incident(
     incident: IncidentCreate,
     response: Response,
     tenant: Annotated[TenantContext, Depends(get_tenant_context)],
+    database_session: Annotated[Session, Depends(get_db)],
     idempotency_key: Annotated[
         str,
         Header(
@@ -52,10 +57,13 @@ def create_incident(
         ),
     ],
 ) -> IncidentResponse:
-    stored_incident, created = incident_repository.create_or_get(
-        incident=incident,
-        organization_id=tenant.organization_id,
-        idempotency_key=idempotency_key,
+    stored_incident, created = (
+        postgres_incident_repository.create_or_get(
+            database_session=database_session,
+            incident=incident,
+            organization_id=tenant.organization_id,
+            idempotency_key=idempotency_key,
+        )
     )
 
     if not created:
