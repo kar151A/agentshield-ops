@@ -5,8 +5,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Validated settings for the AgentShield control API."""
-
     app_name: str = "AgentShield Ops API"
     app_version: str = "0.1.0"
     environment: str = "development"
@@ -14,6 +12,7 @@ class Settings(BaseSettings):
 
     ingestion_api_key: SecretStr
     ingestion_organization_id: str
+    database_url: SecretStr
 
     model_config = SettingsConfigDict(
         env_file=".env",
